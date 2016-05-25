@@ -1,16 +1,16 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'helpscout/version'
+require 'help_scout/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "helpscout"
-  spec.version       = Helpscout::VERSION
+  spec.name          = "help_scout"
+  spec.version       = HelpScout::VERSION
   spec.authors       = ["Mark Mulder"]
   spec.email         = ["markmulder@gmail.com"]
 
-  spec.summary       = "Helpscout helps you work with conversations in Helpscout"
-  spec.homepage      = "https://github.com/Springest/helpscout"
+  spec.summary       = "HelpScout helps you work with conversations in HelpScout"
+  spec.homepage      = "https://github.com/Springest/help_scout"
   spec.license       = "MIT"
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'

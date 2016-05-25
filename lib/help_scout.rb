@@ -1,7 +1,7 @@
-require "helpscout/version"
+require "help_scout/version"
 require "httparty"
 
-module Helpscout
+module HelpScout
   class Client
     attr_accessor :last_response
 
