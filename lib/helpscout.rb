@@ -5,10 +5,6 @@ module Helpscout
     attr_accessor :last_response
 
     def initialize(api_key)
-      if api_key.nil?
-        raise ArgumentError "API key is required"
-      end
-
       @api_key = api_key
     end
 
