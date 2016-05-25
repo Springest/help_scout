@@ -1,5 +1,7 @@
 # Helpscout
 
+This is a gem extracted out from our codebase at Springest. That means that it's currently not as general as it can be, we mostly do stuff with conversations and customers. At the moment we also pass in complete hash objects to create these conversations, something we want to improve on, but take note.
+
 ## Installation
 
 Add this line to your application's Gemfile:
