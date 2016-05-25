@@ -101,14 +101,14 @@ module Helpscout
 
       # The password can be anything, it's not used, see:
       # http://developer.helpscout.net/help-desk-api/
-      options.reverse_merge!({
+      options = {
         basic_auth: {
           username: @api_key, password: 'X'
         },
         headers: {
           'Content-Type' => 'application/json'
         }
-      })
+      }.merge(options)
 
       @last_response = HTTParty.send(method, uri, options)
       @last_response.parsed_response
