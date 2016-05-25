@@ -1,4 +1,5 @@
 require "helpscout/version"
+require "httparty"
 
 module Helpscout
   class Client
