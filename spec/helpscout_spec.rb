@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe HelpScout do
   let(:client) {
-    HelpScout::Client.new("api_key")
+    HelpScout.new("api_key")
   }
   describe '#create_conversation' do
     it 'returns the conversation id' do
