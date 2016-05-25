@@ -12,37 +12,6 @@ module Helpscout
       @api_key = api_key
     end
 
-    def post(path, options = {})
-      options[:body] = options[:body].to_json if options[:body]
-
-      request(:post, path, options)
-    end
-
-    def put(path, options = {})
-      options[:body] = options[:body].to_json if options[:body]
-
-      request(:put, path, options)
-    end
-
-    def get(path, options = {})
-      request(:get, path, options)
-    end
-
-    def search(path, query, page_id = 1, items = [])
-      options = { query: { page: page_id, query: "(#{query})" } }
-
-      result = get(path, options)
-      if result.present?
-        next_page_id = page_id + 1
-        result["items"] += items
-        if next_page_id > result["pages"]
-          return result["items"]
-        else
-          search(path, query, next_page_id, result["items"])
-        end
-      end
-    end
-
     # Public: Create HS conversation
     #
     # data - hash with data
@@ -88,6 +57,37 @@ module Helpscout
     end
 
     protected
+
+    def post(path, options = {})
+      options[:body] = options[:body].to_json if options[:body]
+
+      request(:post, path, options)
+    end
+
+    def put(path, options = {})
+      options[:body] = options[:body].to_json if options[:body]
+
+      request(:put, path, options)
+    end
+
+    def get(path, options = {})
+      request(:get, path, options)
+    end
+
+    def search(path, query, page_id = 1, items = [])
+      options = { query: { page: page_id, query: "(#{query})" } }
+
+      result = get(path, options)
+      if result.present?
+        next_page_id = page_id + 1
+        result["items"] += items
+        if next_page_id > result["pages"]
+          return result["items"]
+        else
+          search(path, query, next_page_id, result["items"])
+        end
+      end
+    end
 
     def request(method, path, options)
       uri = URI("https://api.helpscout.net/v1/#{path}.json")
