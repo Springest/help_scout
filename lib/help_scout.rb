@@ -62,6 +62,10 @@ class HelpScout
     get("customers/#{id}")
   end
 
+  def get_mailboxes
+    get("mailboxes")
+  end
+
   protected
 
   def post(path, options = {})
