@@ -8,13 +8,13 @@ module Helpscout
       @api_key = api_key
     end
 
-    # Public: Create HS conversation
+    # Public: Create conversation
     #
     # data - hash with data
     #
     # More info: http://developer.helpscout.net/help-desk-api/conversations/create/
     #
-    # Returns conversation id from HS
+    # Returns conversation ID
     def create_conversation(data)
       post("conversations", { body: data })
 
@@ -22,9 +22,9 @@ module Helpscout
       conversation_uri.match(/(\d+)\.json$/)[1].to_i
     end
 
-    # Public: Get HS conversation data
+    # Public: Get conversation
     #
-    # id - integer conversation id
+    # id - conversation id
     #
     # More info: http://developer.helpscout.net/help-desk-api/objects/conversation/
     #
@@ -33,23 +33,33 @@ module Helpscout
       get("conversations/#{id}")
     end
 
-    # http://developer.helpscout.net/help-desk-api/conversations/update/
+    # Public: Update conversation
+    #
+    # id - conversation id
+    # data - hash with data
+    #
+    # More info: http://developer.helpscout.net/help-desk-api/conversations/update/
     def update_conversation(id, data)
       put("conversations/#{id}", { body: data })
     end
 
-    def get_conversation(id)
-      get("conversations/#{id}")
-    end
-
-    def get_customer_from_conversation(conversation)
-      customer_id = conversation["item"]["customer"]["id"]
-      get("customers/#{customer_id}")
-    end
-
-    # http://developer.helpscout.net/help-desk-api/search/conversations/
+    # Public: Search for conversations
+    #
+    # query - term to search for
+    #
+    # More info: http://developer.helpscout.net/help-desk-api/search/conversations/
     def search_conversations(query)
       search("search/conversations", query)
+    end
+
+    # Public: Get customer
+    #
+    # id - customer id
+    #
+    # More info: http://developer.helpscout.net/help-desk-api/customers/get/
+    def get_customer(id)
+      customer_id = conversation["item"]["customer"]["id"]
+      get("customers/#{id}")
     end
 
     protected
