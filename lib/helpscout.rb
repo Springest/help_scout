@@ -18,8 +18,9 @@ module Helpscout
     def create_conversation(data)
       post("conversations", { body: data })
 
+      # Extract ID of created conversation from the Location header
       conversation_uri = last_response.headers["location"]
-      conversation_uri.match(/(\d+)\.json$/)[1].to_i
+      conversation_uri.match(/(\d+)\.json$/)[1]
     end
 
     # Public: Get conversation
