@@ -25,13 +25,27 @@ class HelpScout
 
   # Public: Get conversation
   #
-  # id - conversation id
+  # id - conversation ID
   #
   # More info: http://developer.helpscout.net/help-desk-api/objects/conversation/
   #
   # Returns hash from HS with conversation data
   def get_conversation(id)
     get("conversations/#{id}")
+  end
+
+  # Public: Get conversations
+  #
+  # mailbox_id - ID of mailbox (find these with get_mailboxes)
+  # page - integer of page to fetch (default: 1)
+  # modified_since - Only return conversations that have been modified since
+  #                  this UTC datetime (default: nil)
+  #
+  # More info: http://developer.helpscout.net/help-desk-api/conversations/list/
+  #
+  # Returns hash from HS with conversation data
+  def get_conversations(mailbox_id, page = 1, modified_since = nil)
+    get("mailboxes/#{mailbox_id}/conversations", page, modified_since)
   end
 
   # Public: Update conversation
