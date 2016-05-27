@@ -102,7 +102,7 @@ class HelpScout
     options = { query: { page: page_id, query: "(#{query})" } }
 
     result = get(path, options)
-    if result.present?
+    if !result.empty?
       next_page_id = page_id + 1
       result["items"] += items
       if next_page_id > result["pages"]
