@@ -6,20 +6,12 @@ require 'help_scout/version'
 Gem::Specification.new do |spec|
   spec.name          = "help_scout"
   spec.version       = HelpScout::VERSION
-  spec.authors       = ["Mark Mulder"]
-  spec.email         = ["markmulder@gmail.com"]
+  spec.authors       = ["Dennis Paagman", "Miriam Tocino", "Mark Mulder"]
+  spec.email         = ["dennispaagman@gmail.com", "miriam.tocino@gmail.com", "markmulder@gmail.com"]
 
-  spec.summary       = "HelpScout helps you work with conversations in HelpScout"
+  spec.summary       = "HelpScout is a an api client for Help Scout"
   spec.homepage      = "https://github.com/Springest/help_scout"
   spec.license       = "MIT"
-
-  # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
-  # to allow pushing to a single host or delete this section to allow pushing to any host.
-  if spec.respond_to?(:metadata)
-    spec.metadata['allowed_push_host'] = "TODO: Set to 'http://mygemserver.com'"
-  else
-    raise "RubyGems 2.0 or newer is required to protect against public gem pushes."
-  end
 
   spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
   spec.bindir        = "exe"
