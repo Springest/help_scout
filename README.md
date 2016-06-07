@@ -1,4 +1,4 @@
-# Helpscout
+# HelpScout
 
 [![Build Status](https://travis-ci.org/Springest/help_scout.svg?branch=master)](https://travis-ci.org/Springest/help_scout)
 
@@ -9,7 +9,7 @@ This is a gem extracted out from our codebase at Springest. That means that it's
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'helpscout'
+gem 'help_scout'
 ```
 
 And then execute:
@@ -18,7 +18,7 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install helpscout
+    $ gem install help_scout
 
 ## Usage
 
@@ -30,7 +30,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/springest/helpscout.
+Bug reports and pull requests are welcome on GitHub at https://github.com/springest/help_scout.
 
 ## License
 
