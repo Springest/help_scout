@@ -4,6 +4,9 @@ require "httparty"
 class HelpScout
   class ValidationError < StandardError; end
 
+  HTTP_CREATED = 201
+  HTTP_BAD_REQUEST = 400
+
   attr_accessor :last_response
 
   def initialize(api_key)
@@ -20,11 +23,11 @@ class HelpScout
   def create_conversation(data)
     post("conversations", { body: data })
 
-    if last_response.code == 201
+    if last_response.code == HTTP_CREATED
       # Extract ID of created conversation from the Location header
       conversation_uri = last_response.headers["location"]
       return conversation_uri.match(/(\d+)\.json$/)[1]
-    elsif last_response.code == 400
+    elsif last_response.code == HTTP_BAD_REQUEST
       # Validation failed so return the errors
       raise ValidationError, last_response.parsed_response["message"]
     end
