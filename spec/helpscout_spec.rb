@@ -18,6 +18,38 @@ describe HelpScout do
         )
       expect(client.create_conversation(data)).to eq '123'
     end
+
+    context 'with invalid input' do
+      it 'returns validation errors' do
+        data = { subject: "Help me!", customer: { email: "" } }
+
+        url = 'https://api.helpscout.net/v1/conversations.json'
+        stub_request(:post, url).
+          to_return(
+            status: 400,
+            headers: {
+               'Content-Type' => 'application/json'
+            },
+            body: { error: "Input could not be validated", message: "Email is not valid" }.to_json
+          )
+
+        expect { client.create_conversation(data) }.to raise_error(HelpScout::ValidationError, "Email is not valid")
+      end
+    end
+
+    context 'with a not implemented status code' do
+      it 'returns a not implemented error' do
+        data = { subject: "Help me!" }
+
+        url = 'https://api.helpscout.net/v1/conversations.json'
+        stub_request(:post, url).
+          to_return(
+            status: 500,
+          )
+
+        expect { client.create_conversation(data) }.to raise_error(HelpScout::NotImplementedError)
+      end
+    end
   end
 
   describe '#search_conversations' do
