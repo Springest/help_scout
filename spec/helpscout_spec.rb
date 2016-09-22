@@ -36,6 +36,20 @@ describe HelpScout do
         expect { client.create_conversation(data) }.to raise_error(HelpScout::ValidationError, "Email is not valid")
       end
     end
+
+    context 'with a not implemented status code' do
+      it 'returns a not implemented error' do
+        data = { subject: "Help me!" }
+
+        url = 'https://api.helpscout.net/v1/conversations.json'
+        stub_request(:post, url).
+          to_return(
+            status: 500,
+          )
+
+        expect { client.create_conversation(data) }.to raise_error(HelpScout::NotImplementedError)
+      end
+    end
   end
 
   describe '#search_conversations' do

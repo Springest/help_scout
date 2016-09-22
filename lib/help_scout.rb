@@ -3,6 +3,7 @@ require "httparty"
 
 class HelpScout
   class ValidationError < StandardError; end
+  class NotImplementedError < StandardError; end
 
   HTTP_CREATED = 201
   HTTP_BAD_REQUEST = 400
@@ -30,6 +31,8 @@ class HelpScout
     elsif last_response.code == HTTP_BAD_REQUEST
       # Validation failed so return the errors
       raise ValidationError, last_response.parsed_response["message"]
+    else
+      raise NotImplementedError, "Help Scout returned something that is not implemented by the help_scout gem yet. Sorry."
     end
   end
 
