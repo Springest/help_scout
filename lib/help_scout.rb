@@ -32,7 +32,7 @@ class HelpScout
       # Validation failed so return the errors
       raise ValidationError, last_response.parsed_response["message"]
     else
-      raise NotImplementedError, "Help Scout returned something that is not implemented by the help_scout gem yet. Sorry."
+      raise NotImplementedError, "Help Scout returned something that is not implemented by the help_scout gem yet: #{last_response.code}: #{last_response.parsed_response["message"] if last_response.parsed_response}"
     end
   end
 
