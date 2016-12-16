@@ -101,11 +101,15 @@ class HelpScout
   #
   # More info: http://developer.helpscout.net/help-desk-api/reports/user/ratings/
   # 'rating' parameter required: 0 (for all ratings), 1 (Great), 2 (Okay), 3 (Not Good)
-  def get_ratings(mailbox_id, page = 1, modified_since = nil, user_id = nil, start_date = nil, end_date = nil)
-    rating = 0
-    query = {mailboxes: mailbox_id, user: user_id, start: start_date, end: end_date, rating: rating}
+  def reports_user_ratings(user_id, rating, start_date, end_date, options)
+    options = {
+      user: user_id,
+      rating: rating,
+      start: start_date,
+      end: end_date,
+    }
 
-    get("reports/user/ratings", page, modified_since, query)
+    get("reports/user/ratings", options)
   end
 
   protected
