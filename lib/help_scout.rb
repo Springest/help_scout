@@ -97,6 +97,21 @@ class HelpScout
     get("mailboxes")
   end
 
+  # Public: Get ratings
+  #
+  # More info: http://developer.helpscout.net/help-desk-api/reports/user/ratings/
+  # 'rating' parameter required: 0 (for all ratings), 1 (Great), 2 (Okay), 3 (Not Good)
+  def reports_user_ratings(user_id, rating, start_date, end_date, options)
+    options = {
+      user: user_id,
+      rating: rating,
+      start: start_date,
+      end: end_date,
+    }
+
+    get("reports/user/ratings", options)
+  end
+
   protected
 
   def post(path, options = {})
