@@ -58,10 +58,13 @@ class HelpScout
   #
   # Returns hash from HS with conversation data
   def get_conversations(mailbox_id, page = 1, modified_since = nil)
-    options ={
-      page: page,
-      modifiedSince: modified_since,
+    options = {
+      query: {
+        page: page,
+        modifiedSince: modified_since,
+      }
     }
+
     get("mailboxes/#{mailbox_id}/conversations", options)
   end
 
