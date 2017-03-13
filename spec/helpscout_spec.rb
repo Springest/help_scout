@@ -88,4 +88,28 @@ describe HelpScout do
       expect(client.search_conversations("tag:conversion")).to eq conversations["items"]
     end
   end
+
+  describe '#create_thread' do
+    let(:thread) do
+      {
+        createdBy: {
+          type: 'user',
+          id: 42,
+        },
+        type: 'note',
+        body: "Hello, I'm a noteworthy!"
+      }
+    end
+
+    it 'does the correct query' do
+      url = 'https://api.helpscout.net/v1/conversations/4242.json'
+      req = stub_request(:post, url).
+        with(body: thread.to_json).
+        to_return(status: 201)
+
+      expect(client.create_thread(conversation_id: 4242, thread: thread)).
+        to eq(true)
+      expect(req).to have_been_requested
+    end
+  end
 end
