@@ -115,6 +115,29 @@ class HelpScout
     get("reports/user/ratings", options)
   end
 
+
+  # Public: Creates conversation thread
+  #
+  # conversion_id - conversation id
+  # thread - thread content to be created
+  # imported - When set to true no outgoing emails or notifications will be
+  #            generated
+  # reload - Set to true to get the entire conversation in the result
+  #
+  # More info: http://developer.helpscout.net/help-desk-api/conversations/create-thread/
+  #
+  # Returns true if created, false otherwise
+  def create_thread(conversation_id:, thread:, imported: nil, reload: nil)
+    query = {}
+    { reload: reload, imported: imported }.each do |key, value|
+      query[key] = value unless value.nil?
+    end
+
+    post("conversations/#{conversation_id}", body: thread, query: query)
+
+    last_response.code == HTTP_CREATED
+  end
+
   protected
 
   def post(path, options = {})
