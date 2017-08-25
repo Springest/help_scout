@@ -112,4 +112,18 @@ describe HelpScout do
       expect(req).to have_been_requested
     end
   end
+
+  describe '#update_customer' do
+    let(:data) { { "firstName" => "Bob" } }
+
+    it 'does the correct query' do
+      url = 'https://api.helpscout.net/v1/customers/1337.json'
+      req = stub_request(:put, url).
+        with(body: data.to_json).
+        to_return(status: 201)
+
+      client.update_customer(1337, data)
+      expect(req).to have_been_requested
+    end
+  end
 end

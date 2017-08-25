@@ -115,7 +115,6 @@ class HelpScout
     get("reports/user/ratings", options)
   end
 
-
   # Public: Creates conversation thread
   #
   # conversion_id - conversation id
@@ -136,6 +135,16 @@ class HelpScout
     post("conversations/#{conversation_id}", body: thread, query: query)
 
     last_response.code == HTTP_CREATED
+  end
+
+  # Public: Update Customer
+  #
+  # id - customer id
+  # data - hash with data
+  #
+  # More info: http://developer.helpscout.net/help-desk-api/customers/update/
+  def update_customer(id, data)
+    put("customers/#{id}", { body: data })
   end
 
   protected
