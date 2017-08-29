@@ -5,7 +5,11 @@ class HelpScout
   class ValidationError < StandardError; end
   class NotImplementedError < StandardError; end
 
+  # Status codes used by Help Scout, not all are implemented in this gem yet.
+  # http://developer.helpscout.net/help-desk-api/status-codes/
+  HTTP_OK = 200
   HTTP_CREATED = 201
+  HTTP_NO_CONTENT = 204
   HTTP_BAD_REQUEST = 400
 
   attr_accessor :last_response
@@ -24,16 +28,9 @@ class HelpScout
   def create_conversation(data)
     post("conversations", { body: data })
 
-    if last_response.code == HTTP_CREATED
-      # Extract ID of created conversation from the Location header
-      conversation_uri = last_response.headers["location"]
-      return conversation_uri.match(/(\d+)\.json$/)[1]
-    elsif last_response.code == HTTP_BAD_REQUEST
-      # Validation failed so return the errors
-      raise ValidationError, last_response.parsed_response["message"]
-    else
-      raise NotImplementedError, "Help Scout returned something that is not implemented by the help_scout gem yet: #{last_response.code}: #{last_response.parsed_response["message"] if last_response.parsed_response}"
-    end
+    # Extract ID of created conversation from the Location header
+    conversation_uri = last_response.headers["location"]
+    conversation_uri.match(/(\d+)\.json$/)[1]
   end
 
   # Public: Get conversation
@@ -195,6 +192,14 @@ class HelpScout
     }.merge(options)
 
     @last_response = HTTParty.send(method, uri, options)
-    @last_response.parsed_response
+
+    case @last_response.code
+    when HTTP_OK, HTTP_CREATED, HTTP_NO_CONTENT
+      @last_response.parsed_response
+    when HTTP_BAD_REQUEST
+      raise ValidationError, last_response.parsed_response["message"]
+    else
+      raise NotImplementedError, "Help Scout returned something that is not implemented by the help_scout gem yet: #{@last_response.code}: #{@last_response.parsed_response["message"] if @last_response.parsed_response}"
+    end
   end
 end
