@@ -37,6 +37,24 @@ describe HelpScout do
       end
     end
 
+    context 'with a 404 status code' do
+      it 'returns NotFoundError' do
+        url = 'https://api.helpscout.net/v1/conversations/1337.json'
+        stub_request(:get, url).to_return(status: 404)
+
+        expect { client.get_conversation(1337) }.to raise_error(HelpScout::NotFoundError)
+      end
+    end
+
+    context 'with a 500 status code' do
+      it 'returns InternalServerError' do
+        url = 'https://api.helpscout.net/v1/conversations/1337.json'
+        stub_request(:get, url).to_return(status: 500)
+
+        expect { client.get_conversation(1337) }.to raise_error(HelpScout::InternalServerError)
+      end
+    end
+
     context 'with a not implemented status code' do
       it 'returns a not implemented error' do
         data = { subject: "Help me!" }
@@ -44,7 +62,7 @@ describe HelpScout do
         url = 'https://api.helpscout.net/v1/conversations.json'
         stub_request(:post, url).
           to_return(
-            status: 500,
+            status: 503,
           )
 
         expect { client.create_conversation(data) }.to raise_error(HelpScout::NotImplementedError)
