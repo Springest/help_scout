@@ -4,6 +4,8 @@ require "httparty"
 class HelpScout
   class ValidationError < StandardError; end
   class NotImplementedError < StandardError; end
+  class NotFoundError < StandardError; end
+  class InternalServerError < StandardError; end
 
   # Status codes used by Help Scout, not all are implemented in this gem yet.
   # http://developer.helpscout.net/help-desk-api/status-codes/
@@ -11,6 +13,8 @@ class HelpScout
   HTTP_CREATED = 201
   HTTP_NO_CONTENT = 204
   HTTP_BAD_REQUEST = 400
+  HTTP_NOT_FOUND = 404
+  HTTP_INTERNAL_SERVER_ERROR = 500
 
   attr_accessor :last_response
 
@@ -198,6 +202,10 @@ class HelpScout
       @last_response.parsed_response
     when HTTP_BAD_REQUEST
       raise ValidationError, last_response.parsed_response["message"]
+    when HTTP_NOT_FOUND
+      raise NotFoundError
+    when HTTP_INTERNAL_SERVER_ERROR
+      raise InternalServerError
     else
       raise NotImplementedError, "Help Scout returned something that is not implemented by the help_scout gem yet: #{@last_response.code}: #{@last_response.parsed_response["message"] if @last_response.parsed_response}"
     end
