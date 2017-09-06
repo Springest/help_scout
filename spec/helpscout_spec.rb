@@ -144,4 +144,13 @@ describe HelpScout do
       expect(req).to have_been_requested
     end
   end
+
+  describe 'general rate limiting error' do
+    it 'returns TooManyRequestsError' do
+      url = 'https://api.helpscout.net/v1/conversations/1337.json'
+      stub_request(:get, url).to_return(status: 429)
+
+      expect { client.get_conversation(1337) }.to raise_error(HelpScout::TooManyRequestsError)
+    end
+  end
 end

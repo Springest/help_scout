@@ -5,6 +5,7 @@ class HelpScout
   class ValidationError < StandardError; end
   class NotImplementedError < StandardError; end
   class NotFoundError < StandardError; end
+  class TooManyRequestsError < StandardError; end
   class InternalServerError < StandardError; end
 
   # Status codes used by Help Scout, not all are implemented in this gem yet.
@@ -14,6 +15,7 @@ class HelpScout
   HTTP_NO_CONTENT = 204
   HTTP_BAD_REQUEST = 400
   HTTP_NOT_FOUND = 404
+  HTTP_TOO_MANY_REQUESTS = 429
   HTTP_INTERNAL_SERVER_ERROR = 500
 
   attr_accessor :last_response
@@ -206,6 +208,8 @@ class HelpScout
       raise NotFoundError
     when HTTP_INTERNAL_SERVER_ERROR
       raise InternalServerError
+    when HTTP_TOO_MANY_REQUESTS
+      raise TooManyRequestsError
     else
       raise NotImplementedError, "Help Scout returned something that is not implemented by the help_scout gem yet: #{@last_response.code}: #{@last_response.parsed_response["message"] if @last_response.parsed_response}"
     end
