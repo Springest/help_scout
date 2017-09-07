@@ -148,9 +148,16 @@ describe HelpScout do
   describe 'general rate limiting error' do
     it 'returns TooManyRequestsError' do
       url = 'https://api.helpscout.net/v1/conversations/1337.json'
-      stub_request(:get, url).to_return(status: 429)
+      stub_request(:get, url).
+        to_return(
+          status: 429,
+          headers: {
+            retry_after: '10',
+          }
+        )
 
-      expect { client.get_conversation(1337) }.to raise_error(HelpScout::TooManyRequestsError)
+      error_message = "Rate limit of 200 RPM or 12 POST/PUT/DELETE requests per 5 seconds reached. Next request possible in 10 seconds."
+      expect { client.get_conversation(1337) }.to raise_error(HelpScout::TooManyRequestsError, error_message)
     end
   end
 end

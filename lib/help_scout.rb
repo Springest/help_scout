@@ -209,7 +209,9 @@ class HelpScout
     when HTTP_INTERNAL_SERVER_ERROR
       raise InternalServerError
     when HTTP_TOO_MANY_REQUESTS
-      raise TooManyRequestsError
+      retry_after = last_response.headers["Retry-After"]
+      error_message = "Rate limit of 200 RPM or 12 POST/PUT/DELETE requests per 5 seconds reached. Next request possible in #{retry_after} seconds."
+      raise TooManyRequestsError, error_message
     else
       raise NotImplementedError, "Help Scout returned something that is not implemented by the help_scout gem yet: #{@last_response.code}: #{@last_response.parsed_response["message"] if @last_response.parsed_response}"
     end
