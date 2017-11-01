@@ -121,13 +121,53 @@ describe HelpScout do
 
     it 'does the correct query' do
       url = 'https://api.helpscout.net/v1/conversations/4242.json'
-      req = stub_request(:post, url).
+      request = stub_request(:post, url).
         with(body: thread.to_json).
         to_return(status: 201)
 
       expect(client.create_thread(conversation_id: 4242, thread: thread)).
         to eq(true)
-      expect(req).to have_been_requested
+      expect(request).to have_been_requested
+    end
+
+    it 'returns response when reload true' do
+      url = 'https://api.helpscout.net/v1/conversations/4242.json?reload=true'
+      request = stub_request(:post, url).
+        with(body: thread.to_json).
+        to_return(status: 201, body: "conversation")
+
+      expect(client.create_thread(conversation_id: 4242, thread: thread, reload: true)).
+        to eq("conversation")
+    end
+  end
+
+  describe '#update_thread' do
+    let(:thread) do
+      {
+        id: 12345,
+        body: "Hello, I'm a noteworthy!"
+      }
+    end
+
+    it 'does the correct query' do
+      url = 'https://api.helpscout.net/v1/conversations/4242/threads/12345.json'
+      request = stub_request(:put, url).
+        with(body: ({ body: thread[:body] }).to_json).
+        to_return(status: 200)
+
+      expect(client.update_thread(conversation_id: 4242, thread: thread)).
+        to eq(true)
+      expect(request).to have_been_requested
+    end
+
+    it 'returns response when reload true' do
+      url = 'https://api.helpscout.net/v1/conversations/4242/threads/12345.json?reload=true'
+      request = stub_request(:put, url).
+        with(body: ({ body: thread[:body] }).to_json).
+        to_return(status: 200, body: "conversation")
+
+      expect(client.update_thread(conversation_id: 4242, thread: thread, reload: true)).
+        to eq("conversation")
     end
   end
 
@@ -136,12 +176,12 @@ describe HelpScout do
 
     it 'does the correct query' do
       url = 'https://api.helpscout.net/v1/customers/1337.json'
-      req = stub_request(:put, url).
+      request = stub_request(:put, url).
         with(body: data.to_json).
         to_return(status: 201)
 
       client.update_customer(1337, data)
-      expect(req).to have_been_requested
+      expect(request).to have_been_requested
     end
   end
 

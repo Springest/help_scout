@@ -128,7 +128,8 @@ class HelpScout
   #
   # More info: http://developer.helpscout.net/help-desk-api/conversations/create-thread/
   #
-  # Returns true if created, false otherwise
+  # Returns true if created, false otherwise. When used with reload: true it
+  # will return the entire conversation
   def create_thread(conversation_id:, thread:, imported: nil, reload: nil)
     query = {}
     { reload: reload, imported: imported }.each do |key, value|
@@ -137,7 +138,35 @@ class HelpScout
 
     post("conversations/#{conversation_id}", body: thread, query: query)
 
-    last_response.code == HTTP_CREATED
+    if reload
+      last_response.parsed_response
+    else
+      last_response.code == HTTP_CREATED
+    end
+  end
+
+  # Public: Updates conversation thread
+  #
+  # conversion_id - conversation id
+  # thread - thread content to be updated (only the body can be updated)
+  # reload - Set to true to get the entire conversation in the result
+  #
+  # More info: http://developer.helpscout.net/help-desk-api/conversations/update-thread/
+  #
+  # Returns true if updated, false otherwise. When used with reload: true it
+  # will return the entire conversation
+  def update_thread(conversation_id:, thread:, reload: nil)
+    query = {}
+    query[:reload] = reload if reload
+    body = { body: thread[:body] }
+
+    put("conversations/#{conversation_id}/threads/#{thread[:id]}", body: body, query: query)
+
+    if reload
+      last_response.parsed_response
+    else
+      last_response.code == HTTP_OK
+    end
   end
 
   # Public: Update Customer
