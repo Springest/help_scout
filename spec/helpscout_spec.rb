@@ -37,6 +37,15 @@ describe HelpScout do
       end
     end
 
+    context 'with a 403 status code' do
+      it 'returns ForbiddenError' do
+        url = 'https://api.helpscout.net/v1/conversations/1337.json'
+        stub_request(:get, url).to_return(status: 403)
+
+        expect { client.get_conversation(1337) }.to raise_error(HelpScout::ForbiddenError)
+      end
+    end
+
     context 'with a 404 status code' do
       it 'returns NotFoundError' do
         url = 'https://api.helpscout.net/v1/conversations/1337.json'

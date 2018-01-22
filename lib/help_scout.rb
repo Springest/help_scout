@@ -7,6 +7,7 @@ class HelpScout
   class NotFoundError < StandardError; end
   class TooManyRequestsError < StandardError; end
   class InternalServerError < StandardError; end
+  class ForbiddenError < StandardError; end
 
   # Status codes used by Help Scout, not all are implemented in this gem yet.
   # http://developer.helpscout.net/help-desk-api/status-codes/
@@ -14,6 +15,7 @@ class HelpScout
   HTTP_CREATED = 201
   HTTP_NO_CONTENT = 204
   HTTP_BAD_REQUEST = 400
+  HTTP_FORBIDDEN = 403
   HTTP_NOT_FOUND = 404
   HTTP_TOO_MANY_REQUESTS = 429
   HTTP_INTERNAL_SERVER_ERROR = 500
@@ -233,6 +235,8 @@ class HelpScout
       @last_response.parsed_response
     when HTTP_BAD_REQUEST
       raise ValidationError, last_response.parsed_response["message"]
+    when HTTP_FORBIDDEN
+      raise ForbiddenError
     when HTTP_NOT_FOUND
       raise NotFoundError
     when HTTP_INTERNAL_SERVER_ERROR
