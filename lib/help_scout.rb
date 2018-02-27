@@ -234,7 +234,7 @@ class HelpScout
     when HTTP_OK, HTTP_CREATED, HTTP_NO_CONTENT
       @last_response.parsed_response
     when HTTP_BAD_REQUEST
-      raise ValidationError, last_response.parsed_response["message"]
+      raise ValidationError, last_response.parsed_response["validationErrors"]
     when HTTP_FORBIDDEN
       raise ForbiddenError
     when HTTP_NOT_FOUND

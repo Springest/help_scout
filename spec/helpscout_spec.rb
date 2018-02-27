@@ -21,7 +21,7 @@ describe HelpScout do
 
     context 'with invalid input' do
       it 'returns validation errors' do
-        data = { subject: "Help me!", customer: { email: "" } }
+        data = { subject: "Help me!", customer: { email: "foo@hotmail.con" } }
 
         url = 'https://api.helpscout.net/v1/conversations.json'
         stub_request(:post, url).
@@ -30,10 +30,19 @@ describe HelpScout do
             headers: {
                'Content-Type' => 'application/json'
             },
-            body: { error: "Input could not be validated", message: "Email is not valid" }.to_json
+            body: {
+              "error" => "Input could not be validated",
+              "validationErrors" => [
+                {
+                  "property" => "customer:email",
+                  "value" => "foo@hotmail.con",
+                  "message" => "Email is not valid"
+                }
+              ]
+            }.to_json
           )
 
-        expect { client.create_conversation(data) }.to raise_error(HelpScout::ValidationError, "Email is not valid")
+        expect { client.create_conversation(data) }.to raise_error(HelpScout::ValidationError, '[{"property"=>"customer:email", "value"=>"foo@hotmail.con", "message"=>"Email is not valid"}]')
       end
     end
 

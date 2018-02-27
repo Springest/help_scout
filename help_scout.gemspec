@@ -6,8 +6,8 @@ require 'help_scout/version'
 Gem::Specification.new do |spec|
   spec.name          = "help_scout"
   spec.version       = HelpScout::VERSION
-  spec.authors       = ["Dennis Paagman", "Miriam Tocino", "Mark Mulder"]
-  spec.email         = ["dennispaagman@gmail.com", "miriam.tocino@gmail.com", "markmulder@gmail.com"]
+  spec.authors       = ["Dennis Paagman", "Miriam Tocino", "Mark Mulder", "Martin Balk"]
+  spec.email         = ["dennispaagman@gmail.com", "miriam.tocino@gmail.com", "markmulder@gmail.com", "m@martinbalk.com"]
 
   spec.summary       = "HelpScout is an API client for Help Scout"
   spec.homepage      = "https://github.com/Springest/help_scout"
