@@ -8,6 +8,7 @@ class HelpScout
   class TooManyRequestsError < StandardError; end
   class InternalServerError < StandardError; end
   class ForbiddenError < StandardError; end
+  class ServiceUnavailable < StandardError; end
 
   # Status codes used by Help Scout, not all are implemented in this gem yet.
   # http://developer.helpscout.net/help-desk-api/status-codes/
@@ -19,6 +20,7 @@ class HelpScout
   HTTP_NOT_FOUND = 404
   HTTP_TOO_MANY_REQUESTS = 429
   HTTP_INTERNAL_SERVER_ERROR = 500
+  HTTP_SERVICE_UNAVAILABLE = 503
 
   attr_accessor :last_response
 
@@ -229,10 +231,9 @@ class HelpScout
     }.merge(options)
 
     @last_response = HTTParty.send(method, uri, options)
-
-    case @last_response.code
+    case last_response.code
     when HTTP_OK, HTTP_CREATED, HTTP_NO_CONTENT
-      @last_response.parsed_response
+      last_response.parsed_response
     when HTTP_BAD_REQUEST
       raise ValidationError, last_response.parsed_response["validationErrors"]
     when HTTP_FORBIDDEN
@@ -242,12 +243,15 @@ class HelpScout
     when HTTP_INTERNAL_SERVER_ERROR
       error_message = JSON.parse(last_response.body)["error"]
       raise InternalServerError, error_message
+    when HTTP_SERVICE_UNAVAILABLE
+      raise ServiceUnavailable
     when HTTP_TOO_MANY_REQUESTS
       retry_after = last_response.headers["Retry-After"]
-      error_message = "Rate limit of 200 RPM or 12 POST/PUT/DELETE requests per 5 seconds reached. Next request possible in #{retry_after} seconds."
-      raise TooManyRequestsError, error_message
+      message = "Rate limit of 200 RPM or 12 POST/PUT/DELETE requests per 5 " +
+        "seconds reached. Next request possible in #{retry_after} seconds."
+      raise TooManyRequestsError, message
     else
-      raise NotImplementedError, "Help Scout returned something that is not implemented by the help_scout gem yet: #{@last_response.code}: #{@last_response.parsed_response["message"] if @last_response.parsed_response}"
+      raise NotImplementedError, "Help Scout returned something that is not implemented by the help_scout gem yet: #{last_response.code}: #{last_response.parsed_response["message"] if last_response.parsed_response}"
     end
   end
 end
