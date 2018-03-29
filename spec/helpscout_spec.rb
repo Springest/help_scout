@@ -84,6 +84,15 @@ describe HelpScout do
       end
     end
 
+    context 'with a 503 status code' do
+      it 'returns ServiceUnavailable' do
+        url = 'https://api.helpscout.net/v1/conversations/1337.json'
+        stub_request(:get, url).to_return(status: 503)
+
+        expect { client.get_conversation(1337) }.to raise_error(HelpScout::ServiceUnavailable)
+      end
+    end
+
     context 'with a not implemented status code' do
       it 'returns a not implemented error' do
         data = { subject: "Help me!" }
@@ -91,7 +100,7 @@ describe HelpScout do
         url = 'https://api.helpscout.net/v1/conversations.json'
         stub_request(:post, url).
           to_return(
-            status: 503,
+            status: 402,
           )
 
         expect { client.create_conversation(data) }.to raise_error(HelpScout::NotImplementedError)
