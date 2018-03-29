@@ -240,7 +240,8 @@ class HelpScout
     when HTTP_NOT_FOUND
       raise NotFoundError
     when HTTP_INTERNAL_SERVER_ERROR
-      raise InternalServerError
+      error_message = JSON.parse(last_response.body)["error"]
+      raise InternalServerError, error_message
     when HTTP_TOO_MANY_REQUESTS
       retry_after = last_response.headers["Retry-After"]
       error_message = "Rate limit of 200 RPM or 12 POST/PUT/DELETE requests per 5 seconds reached. Next request possible in #{retry_after} seconds."
