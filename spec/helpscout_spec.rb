@@ -65,11 +65,22 @@ describe HelpScout do
     end
 
     context 'with a 500 status code' do
-      it 'returns InternalServerError' do
-        url = 'https://api.helpscout.net/v1/conversations/1337.json'
-        stub_request(:get, url).to_return(status: 500)
+      it 'returns InternalServerError with body' do
+        expected_error_message = "Did not find any valid email for customer 1111"
 
-        expect { client.get_conversation(1337) }.to raise_error(HelpScout::InternalServerError)
+        url = 'https://api.helpscout.net/v1/conversations/1337.json'
+        stub_request(:post, url).
+          to_return(
+            status: 500,
+            body: {
+              "code": 500,
+              "error": expected_error_message,
+            }.to_json,
+        )
+
+        expect {
+          client.create_thread(conversation_id: 1337, thread: {})
+        }.to raise_error(HelpScout::InternalServerError, expected_error_message)
       end
     end
 
