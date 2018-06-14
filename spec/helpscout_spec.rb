@@ -223,6 +223,17 @@ describe HelpScout do
     end
   end
 
+  describe "#delete_conversation" do
+    it "deletes the conversation" do
+      url = "https://api.helpscout.net/v1/conversations/4242.json"
+
+      request = stub_request(:delete, url).to_return(status: 200)
+
+      client.delete_conversation(4242)
+      expect(request).to have_been_requested
+    end
+  end
+
   describe 'general rate limiting error' do
     it 'returns TooManyRequestsError' do
       url = 'https://api.helpscout.net/v1/conversations/1337.json'

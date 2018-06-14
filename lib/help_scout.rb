@@ -94,6 +94,15 @@ class HelpScout
     search("search/conversations", query)
   end
 
+  # Public: Delete conversation
+  #
+  # id - conversation id
+  #
+  # More info: https://developer.helpscout.com/help-desk-api/conversations/delete/
+  def delete_conversation(id)
+    delete("conversations/#{id}")
+  end
+
   # Public: Get customer
   #
   # id - customer id
@@ -199,6 +208,10 @@ class HelpScout
 
   def get(path, options = {})
     request(:get, path, options)
+  end
+
+  def delete(path, options = {})
+    request(:delete, path, options)
   end
 
   def search(path, query, page_id = 1, items = [])
