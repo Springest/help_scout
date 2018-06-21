@@ -249,4 +249,22 @@ describe HelpScout do
       expect { client.get_conversation(1337) }.to raise_error(HelpScout::TooManyRequestsError, error_message)
     end
   end
+
+  it "sends Content-Type when body" do
+      url = "https://api.helpscout.net/v1/conversations/4242.json"
+      stub_request(:delete, url).to_return(status: 200)
+      stub_request(:put, url).to_return(status: 200)
+
+      client.delete_conversation(4242)
+      expect(WebMock).to have_requested(:delete, url).with(headers: {
+        "Authorization": "Basic YXBpX2tleTpY"
+      })
+
+      client.update_conversation(4242, subject: "Hello World")
+      expect(WebMock).to have_requested(:put, url).with(headers: {
+        "Authorization": "Basic YXBpX2tleTpY",
+        "Content-Type": "application/json"
+      })
+
+  end
 end
