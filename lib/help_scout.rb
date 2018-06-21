@@ -238,10 +238,12 @@ class HelpScout
       basic_auth: {
         username: @api_key, password: 'X'
       },
-      headers: {
-        'Content-Type' => 'application/json'
-      }
+      headers: {}
     }.merge(options)
+
+    if options.key?(:body)
+      options[:headers]['Content-Type'] ||= 'application/json'
+    end
 
     @last_response = HTTParty.send(method, uri, options)
     case last_response.code
