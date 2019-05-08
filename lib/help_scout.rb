@@ -24,8 +24,9 @@ class HelpScout
 
   attr_accessor :last_response
 
-  def initialize(api_key)
+  def initialize(api_key, api_secret)
     @api_key = api_key
+    @api_secret = api_secret
   end
 
   # Public: Create conversation
@@ -40,7 +41,7 @@ class HelpScout
 
     # Extract ID of created conversation from the Location header
     conversation_uri = last_response.headers["location"]
-    conversation_uri.match(/(\d+)\.json$/)[1]
+    conversation_uri.match(/(\d+)$/)[0]
   end
 
   # Public: Get conversation
@@ -229,23 +230,37 @@ class HelpScout
     end
   end
 
+  def get_token
+    options = {
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: {
+        grant_type: "client_credentials",
+        client_id: @api_key,
+        client_secret: @api_secret
+      }
+    }
+    options[:body] = options[:body].to_json
+    response = HTTParty.send(:post, 'https://api.helpscout.net/v2/oauth2/token', options)
+    token = JSON.parse(response.body)['access_token']
+    "Bearer #{token}"
+  end
+
   def request(method, path, options)
-    uri = URI("https://api.helpscout.net/v1/#{path}.json")
+    uri = URI("https://api.helpscout.net/v2/#{path}")
 
     # The password can be anything, it's not used, see:
     # http://developer.helpscout.net/help-desk-api/
     options = {
-      basic_auth: {
-        username: @api_key, password: 'X'
-      },
-      headers: {}
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': get_token()
+      }
     }.merge(options)
 
-    if options.key?(:body)
-      options[:headers]['Content-Type'] ||= 'application/json'
-    end
-
     @last_response = HTTParty.send(method, uri, options)
+
     case last_response.code
     when HTTP_OK, HTTP_CREATED, HTTP_NO_CONTENT
       last_response.parsed_response
