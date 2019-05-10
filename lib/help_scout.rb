@@ -250,8 +250,6 @@ class HelpScout
   def request(method, path, options)
     uri = URI("https://api.helpscout.net/v2/#{path}")
 
-    # The password can be anything, it's not used, see:
-    # http://developer.helpscout.net/help-desk-api/
     options = {
       headers: {
         'Content-Type': 'application/json',
