@@ -1,18 +1,27 @@
 require 'spec_helper'
 
 describe HelpScout do
-  let(:client) { HelpScout.new("api_key") }
+  let(:client) { HelpScout.new("api_key", "api_secret") }
+
+  before(:each) do
+    stub_request(:post, 'https://api.helpscout.net/v2/oauth2/token').to_return(
+      status: 200,
+      body: {
+        access_token: 'YXBpX2tleTpY'
+      }.to_json
+    )
+  end
 
   describe '#create_conversation' do
     it 'returns the conversation id' do
       data = { subject: "Help me!" }
 
-      url = 'https://api.helpscout.net/v1/conversations.json'
+      url = 'https://api.helpscout.net/v2/conversations'
       stub_request(:post, url).
         to_return(
           status: 201,
           headers: {
-            location: 'https://api.helpscout.net/v1/conversations/123.json'
+            location: 'https://api.helpscout.net/v2/conversations/123'
           },
           body: data.to_json,
         )
@@ -23,7 +32,7 @@ describe HelpScout do
       it 'returns validation errors' do
         data = { subject: "Help me!", customer: { email: "foo@hotmail.con" } }
 
-        url = 'https://api.helpscout.net/v1/conversations.json'
+        url = 'https://api.helpscout.net/v2/conversations'
         stub_request(:post, url).
           to_return(
             status: 400,
@@ -48,7 +57,7 @@ describe HelpScout do
 
     context 'with a 403 status code' do
       it 'returns ForbiddenError' do
-        url = 'https://api.helpscout.net/v1/conversations/1337.json'
+        url = 'https://api.helpscout.net/v2/conversations/1337'
         stub_request(:get, url).to_return(status: 403)
 
         expect { client.get_conversation(1337) }.to raise_error(HelpScout::ForbiddenError)
@@ -57,7 +66,7 @@ describe HelpScout do
 
     context 'with a 404 status code' do
       it 'returns NotFoundError' do
-        url = 'https://api.helpscout.net/v1/conversations/1337.json'
+        url = 'https://api.helpscout.net/v2/conversations/1337'
         stub_request(:get, url).to_return(status: 404)
 
         expect { client.get_conversation(1337) }.to raise_error(HelpScout::NotFoundError)
@@ -68,7 +77,7 @@ describe HelpScout do
       it 'returns InternalServerError with body' do
         expected_error_message = "Did not find any valid email for customer 1111"
 
-        url = 'https://api.helpscout.net/v1/conversations/1337.json'
+        url = 'https://api.helpscout.net/v2/conversations/1337'
         stub_request(:post, url).
           to_return(
             status: 500,
@@ -86,7 +95,7 @@ describe HelpScout do
 
     context 'with a 503 status code' do
       it 'returns ServiceUnavailable' do
-        url = 'https://api.helpscout.net/v1/conversations/1337.json'
+        url = 'https://api.helpscout.net/v2/conversations/1337'
         stub_request(:get, url).to_return(status: 503)
 
         expect { client.get_conversation(1337) }.to raise_error(HelpScout::ServiceUnavailable)
@@ -97,7 +106,7 @@ describe HelpScout do
       it 'returns a not implemented error' do
         data = { subject: "Help me!" }
 
-        url = 'https://api.helpscout.net/v1/conversations.json'
+        url = 'https://api.helpscout.net/v2/conversations'
         stub_request(:post, url).
           to_return(
             status: 402,
@@ -132,7 +141,7 @@ describe HelpScout do
     end
 
     it 'does the correct query' do
-      url = 'https://api.helpscout.net/v1/search/conversations.json?page=1&query=(tag:conversion)'
+      url = 'https://api.helpscout.net/v2/search/conversations?page=1&query=(tag:conversion)'
       stub_request(:get, url).
         to_return(
           status: 200,
@@ -158,7 +167,7 @@ describe HelpScout do
     end
 
     it 'does the correct query' do
-      url = 'https://api.helpscout.net/v1/conversations/4242.json'
+      url = 'https://api.helpscout.net/v2/conversations/4242'
       request = stub_request(:post, url).
         with(body: thread.to_json).
         to_return(status: 201)
@@ -169,7 +178,7 @@ describe HelpScout do
     end
 
     it 'returns response when reload true' do
-      url = 'https://api.helpscout.net/v1/conversations/4242.json?reload=true'
+      url = 'https://api.helpscout.net/v2/conversations/4242?reload=true'
       request = stub_request(:post, url).
         with(body: thread.to_json).
         to_return(status: 201, body: "conversation")
@@ -188,7 +197,7 @@ describe HelpScout do
     end
 
     it 'does the correct query' do
-      url = 'https://api.helpscout.net/v1/conversations/4242/threads/12345.json'
+      url = 'https://api.helpscout.net/v2/conversations/4242/threads/12345'
       request = stub_request(:put, url).
         with(body: ({ body: thread[:body] }).to_json).
         to_return(status: 200)
@@ -199,7 +208,7 @@ describe HelpScout do
     end
 
     it 'returns response when reload true' do
-      url = 'https://api.helpscout.net/v1/conversations/4242/threads/12345.json?reload=true'
+      url = 'https://api.helpscout.net/v2/conversations/4242/threads/12345?reload=true'
       request = stub_request(:put, url).
         with(body: ({ body: thread[:body] }).to_json).
         to_return(status: 200, body: "conversation")
@@ -213,7 +222,7 @@ describe HelpScout do
     let(:data) { { "firstName" => "Bob" } }
 
     it 'does the correct query' do
-      url = 'https://api.helpscout.net/v1/customers/1337.json'
+      url = 'https://api.helpscout.net/v2/customers/1337'
       request = stub_request(:put, url).
         with(body: data.to_json).
         to_return(status: 201)
@@ -225,7 +234,7 @@ describe HelpScout do
 
   describe "#delete_conversation" do
     it "deletes the conversation" do
-      url = "https://api.helpscout.net/v1/conversations/4242.json"
+      url = "https://api.helpscout.net/v2/conversations/4242"
 
       request = stub_request(:delete, url).to_return(status: 200)
 
@@ -236,7 +245,7 @@ describe HelpScout do
 
   describe 'general rate limiting error' do
     it 'returns TooManyRequestsError' do
-      url = 'https://api.helpscout.net/v1/conversations/1337.json'
+      url = 'https://api.helpscout.net/v2/conversations/1337'
       stub_request(:get, url).
         to_return(
           status: 429,
@@ -251,18 +260,18 @@ describe HelpScout do
   end
 
   it "sends Content-Type when body" do
-      url = "https://api.helpscout.net/v1/conversations/4242.json"
+      url = "https://api.helpscout.net/v2/conversations/4242"
       stub_request(:delete, url).to_return(status: 200)
       stub_request(:put, url).to_return(status: 200)
 
       client.delete_conversation(4242)
       expect(WebMock).to have_requested(:delete, url).with(headers: {
-        "Authorization": "Basic YXBpX2tleTpY"
+        "Authorization": "Bearer YXBpX2tleTpY"
       })
 
       client.update_conversation(4242, subject: "Hello World")
       expect(WebMock).to have_requested(:put, url).with(headers: {
-        "Authorization": "Basic YXBpX2tleTpY",
+        "Authorization": "Bearer YXBpX2tleTpY",
         "Content-Type": "application/json"
       })
 
