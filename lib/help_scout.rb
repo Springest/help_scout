@@ -25,7 +25,7 @@ class HelpScout
   HTTP_SERVICE_UNAVAILABLE = 503
 
   # https://developer.helpscout.com/mailbox-api/endpoints/conversations/list/
-  CONVERSATION_STATES = ["active", "closed", "open", "pending", "spam"]
+  CONVERSATION_STATUSES = ["active", "closed", "open", "pending", "spam"]
 
   attr_accessor :last_response
 
@@ -86,8 +86,8 @@ class HelpScout
     end
     if data[:status]
       status = data[:status]
-      if !CONVERSATION_STATES.include?(status)
-        raise InvalidDataError.new("status \"#{status}\" not supported, must be one of #{CONVERSATION_STATES}")
+      if !CONVERSATION_STATUSES.include?(status)
+        raise InvalidDataError.new("status \"#{status}\" not supported, must be one of #{CONVERSATION_STATUSES}")
       end
 
       instructions << {
