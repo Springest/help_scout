@@ -159,7 +159,7 @@ class HelpScout
   # imported: no outgoing e-mails or notifications will be generated
   #
   # More info: https://developer.helpscout.com/mailbox-api/endpoints/conversations/threads/note/
-  def create_note(conversation_id:, text:, user:, imported: false)
+  def create_note(conversation_id:, text:, user: nil, imported: false)
     data = {
       text: text,
       user: user,
@@ -188,9 +188,10 @@ class HelpScout
   # Public: Create reply thread
   #
   # More info: https://developer.helpscout.com/mailbox-api/endpoints/conversations/threads/reply/
-  def create_reply(conversation_id:, text:, customer:, imported: false)
+  def create_reply(conversation_id:, text:, customer:, user: nil, imported: false)
     data = {
       text: text,
+      user: user,
       customer: {
         id: customer
       },
