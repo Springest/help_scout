@@ -173,11 +173,14 @@ class HelpScout
   # Public: Create phone thread
   #
   # More info: https://developer.helpscout.com/mailbox-api/endpoints/conversations/threads/phone/
-  def create_phone(conversation_id:, text:, imported: false)
+  def create_phone(conversation_id:, text:, customer:, imported: false)
     # Note, hs does not list user as an accepted type
     # https://developer.helpscout.com/mailbox-api/endpoints/conversations/threads/phone/
     data = {
       text: text,
+      customer: {
+        id: customer
+      },
       imported: imported,
     }
     post("conversations/#{conversation_id}/phones", body: data)
