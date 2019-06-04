@@ -53,12 +53,18 @@ class HelpScout
   # Public: Get conversation
   #
   # id - conversation ID
+  # embed_threads - boolean - This will load in subentities, currently only
+  # Threads are supported by HS
   #
   # More info: https://developer.helpscout.com/mailbox-api/endpoints/conversations/get/
   #
   # Returns hash from HS with conversation data
-  def get_conversation(id)
-    get("conversations/#{id}")
+  def get_conversation(id, embed_threads: false)
+    if embed_threads
+      get("conversations/#{id}?embed=threads")
+    else
+      get("conversations/#{id}")
+    end
   end
 
   # Public: Update conversation
