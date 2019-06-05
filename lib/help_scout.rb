@@ -135,6 +135,14 @@ class HelpScout
     put("conversations/#{id}/tags", { body: data })
   end
 
+  # Public: Update conversation custom fields
+  #
+  # More info: https://developer.helpscout.com/mailbox-api/endpoints/conversations/custom_fields/update/
+  def update_conversation_custom_fields(id, fields)
+    data = { fields: fields }
+    put("conversations/#{id}/fields", { body: data })
+  end
+
   # Public: Search for conversations
   #
   # query - term to search for
