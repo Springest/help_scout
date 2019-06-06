@@ -1,6 +1,29 @@
 require "help_scout/version"
 require "httparty"
 
+class DefaultTokenStorage
+  def initialize(api_key, api_secret)
+    @api_key = api_key
+    @api_secret = api_secret
+  end
+
+  def token
+    @token ||= generate_token
+  end
+
+  def reset_token
+    new_token = generate_token
+    # You could store it in redis now
+    @token = new_token
+  end
+
+  private
+
+  def generate_token
+    HelpScout.generate_oauth_token(@api_key, @api_secret)
+  end
+end
+
 class HelpScout
   class ValidationError < StandardError; end
   class NotImplementedError < StandardError; end
@@ -18,6 +41,7 @@ class HelpScout
   HTTP_CREATED = 201
   HTTP_NO_CONTENT = 204
   HTTP_BAD_REQUEST = 400
+  HTTP_UNAUTHORIZED = 401
   HTTP_FORBIDDEN = 403
   HTTP_NOT_FOUND = 404
   HTTP_TOO_MANY_REQUESTS = 429
@@ -27,11 +51,27 @@ class HelpScout
   # https://developer.helpscout.com/mailbox-api/endpoints/conversations/list/
   CONVERSATION_STATUSES = ["active", "closed", "open", "pending", "spam"]
 
+  # https://developer.helpscout.com/mailbox-api/overview/authentication/#client-credentials-flow
+  def self.generate_oauth_token(api_key, api_secret)
+    options = {
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: {
+        grant_type: "client_credentials",
+        client_id: api_key,
+        client_secret: api_secret,
+      }
+    }
+    options[:body] = options[:body].to_json
+    response = HTTParty.post("https://api.helpscout.net/v2/oauth2/token", options)
+    JSON.parse(response.body)["access_token"]
+  end
+
   attr_accessor :last_response
 
-  def initialize(api_key, api_secret)
-    @api_key = api_key
-    @api_secret = api_secret
+  def initialize(api_key, api_secret, token_storage = DefaultTokenStorage)
+    @token_storage = token_storage.new(api_key, api_secret)
   end
 
   # Public: Create conversation
@@ -314,37 +354,24 @@ class HelpScout
     end
   end
 
-  # https://developer.helpscout.com/mailbox-api/overview/authentication/#client-credentials-flow
-  def get_token
-    options = {
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: {
-        grant_type: "client_credentials",
-        client_id: @api_key,
-        client_secret: @api_secret
-      }
-    }
-    options[:body] = options[:body].to_json
-    response = HTTParty.send(:post, "https://api.helpscout.net/v2/oauth2/token", options)
-    token = JSON.parse(response.body)["access_token"]
-    "Bearer #{token}"
-  end
-
   def request(method, path, options)
     uri = URI("https://api.helpscout.net/v2/#{path}")
 
     options = {
       headers: {
         "Content-Type": "application/json",
-        "Authorization": get_token()
+        "Authorization": "Bearer #{@token_storage.token}",
       }
     }.merge(options)
 
     @last_response = HTTParty.send(method, uri, options)
 
     case last_response.code
+    when HTTP_UNAUTHORIZED
+      # Unauthorized means our token is expired. We will fetch a new one, and
+      # retry the original request
+      @token_storage.reset_token
+      request(method, path, options)
     when HTTP_OK, HTTP_CREATED, HTTP_NO_CONTENT
       last_response.parsed_response
     when HTTP_BAD_REQUEST
