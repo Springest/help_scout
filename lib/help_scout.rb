@@ -2,25 +2,12 @@ require "help_scout/version"
 require "httparty"
 
 class DefaultTokenStorage
-  def initialize(api_key, api_secret)
-    @api_key = api_key
-    @api_secret = api_secret
-  end
-
   def token
-    @token ||= generate_token
+    @token
   end
 
-  def reset_token
-    new_token = generate_token
-    # You could store it in redis now
-    @token = new_token
-  end
-
-  private
-
-  def generate_token
-    HelpScout.generate_oauth_token(@api_key, @api_secret)
+  def store_token(token)
+    @token = token
   end
 end
 
@@ -52,15 +39,15 @@ class HelpScout
   CONVERSATION_STATUSES = ["active", "closed", "open", "pending", "spam"]
 
   # https://developer.helpscout.com/mailbox-api/overview/authentication/#client-credentials-flow
-  def self.generate_oauth_token(api_key, api_secret)
+  def generate_oauth_token
     options = {
       headers: {
         "Content-Type": "application/json"
       },
       body: {
         grant_type: "client_credentials",
-        client_id: api_key,
-        client_secret: api_secret,
+        client_id: @api_key,
+        client_secret: @api_secret,
       }
     }
     options[:body] = options[:body].to_json
@@ -70,8 +57,10 @@ class HelpScout
 
   attr_accessor :last_response
 
-  def initialize(api_key, api_secret, token_storage = DefaultTokenStorage)
-    @token_storage = token_storage.new(api_key, api_secret)
+  def initialize(api_key, api_secret, token_storage = DefaultTokenStorage.new)
+    @api_key = api_key
+    @api_secret = api_secret
+    @token_storage = token_storage
   end
 
   # Public: Create conversation
@@ -363,6 +352,7 @@ class HelpScout
         "Authorization": "Bearer #{@token_storage.token}",
       }
     }.merge(options)
+    puts "using token: #{@token_storage.token}"
 
     @last_response = HTTParty.send(method, uri, options)
 
@@ -370,7 +360,9 @@ class HelpScout
     when HTTP_UNAUTHORIZED
       # Unauthorized means our token is expired. We will fetch a new one, and
       # retry the original request
-      @token_storage.reset_token
+      new_token = generate_oauth_token
+      @token_storage.store_token(new_token)
+      options.delete(:headers)
       request(method, path, options)
     when HTTP_OK, HTTP_CREATED, HTTP_NO_CONTENT
       last_response.parsed_response
