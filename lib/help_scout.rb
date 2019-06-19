@@ -339,10 +339,16 @@ class HelpScout
   def request(method, path, options)
     uri = URI("https://api.helpscout.net/v2/#{path}")
 
+    token = @token_storage.token
+    if token.nil?
+      token = generate_oauth_token
+      @token_storage.store_token(token)
+    end
+
     options = {
       headers: {
         "Content-Type": "application/json",
-        "Authorization": "Bearer #{@token_storage.token}",
+        "Authorization": "Bearer #{token}",
       }
     }.merge(options)
 

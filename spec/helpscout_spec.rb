@@ -27,11 +27,6 @@ describe HelpScout do
 
       url = "https://api.helpscout.net/v2/conversations/1337"
       stub_request(:get, url).
-        with(headers: { "Authorization" => "Bearer"}).
-        to_return(status: HelpScout::HTTP_UNAUTHORIZED)
-
-      url = "https://api.helpscout.net/v2/conversations/1337"
-      stub_request(:get, url).
         with(headers: { "Authorization" => "Bearer ACCESS_TOKEN"}).
         to_return(status: 200)
 
