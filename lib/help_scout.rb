@@ -1,15 +1,8 @@
 require "help_scout/version"
+require "help_scout/token_storage/default"
+require "help_scout/token_storage/redis"
+
 require "httparty"
-
-class DefaultTokenStorage
-  def token
-    @token
-  end
-
-  def store_token(token)
-    @token = token
-  end
-end
 
 class HelpScout
   class ValidationError < StandardError; end
@@ -352,7 +345,6 @@ class HelpScout
         "Authorization": "Bearer #{@token_storage.token}",
       }
     }.merge(options)
-    puts "using token: #{@token_storage.token}"
 
     @last_response = HTTParty.send(method, uri, options)
 
