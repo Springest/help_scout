@@ -16,6 +16,32 @@ describe HelpScout do
     )
   end
 
+  context "token storage" do
+    it "reuses stored token" do
+      token_stub = stub_request(:post, "https://api.helpscout.net/v2/oauth2/token").to_return(
+        status: 200,
+        body: {
+          access_token: "ACCESS_TOKEN"
+        }.to_json
+      )
+
+      url = "https://api.helpscout.net/v2/conversations/1337"
+      stub_request(:get, url).
+        with(headers: { "Authorization" => "Bearer"}).
+        to_return(status: HelpScout::HTTP_UNAUTHORIZED)
+
+      url = "https://api.helpscout.net/v2/conversations/1337"
+      stub_request(:get, url).
+        with(headers: { "Authorization" => "Bearer ACCESS_TOKEN"}).
+        to_return(status: 200)
+
+      client.get_conversation(1337)
+      client.get_conversation(1337)
+
+      expect(token_stub).to have_been_requested.once
+    end
+  end
+
   describe "#create_conversation" do
     it "returns the conversation id" do
       data = {
