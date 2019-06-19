@@ -1,6 +1,6 @@
 class HelpScout
   module TokenStorage
-    class Default
+    class Memory
       def token
         @token
       end

@@ -1,5 +1,5 @@
 require "help_scout/version"
-require "help_scout/token_storage/default"
+require "help_scout/token_storage/memory"
 require "help_scout/token_storage/redis"
 
 require "httparty"
@@ -50,7 +50,7 @@ class HelpScout
 
   attr_accessor :last_response
 
-  def initialize(api_key, api_secret, token_storage = DefaultTokenStorage.new)
+  def initialize(api_key, api_secret, token_storage = TokenStorage::Memory.new)
     @api_key = api_key
     @api_secret = api_secret
     @token_storage = token_storage
