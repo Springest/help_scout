@@ -116,19 +116,6 @@ describe HelpScout do
           }
         }
 
-        errors = [
-          {
-            "path" => "subject",
-            "message" => "must not be empty",
-            "source" => "JSON",
-            "_links" => {
-              "about" => {
-                "href" => "http://developer.helpscout.net/mailbox-api/overview/errors#NotEmpty"
-              }
-            }
-          }
-        ]
-
         url = "https://api.helpscout.net/v2/conversations"
         stub_request(:post, url).
           to_return(
@@ -141,7 +128,7 @@ describe HelpScout do
             body: response_body.to_json
           )
 
-        expect { client.create_conversation(data) }.to raise_error(HelpScout::ValidationError, errors.to_json)
+        expect { client.create_conversation(data) }.to raise_error(HelpScout::ValidationError)
       end
     end
 

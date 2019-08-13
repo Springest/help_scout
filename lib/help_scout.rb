@@ -365,8 +365,7 @@ class HelpScout
     when HTTP_OK, HTTP_CREATED, HTTP_NO_CONTENT
       last_response.parsed_response
     when HTTP_BAD_REQUEST
-      body = JSON.parse(last_response.parsed_response)
-      raise ValidationError, body["_embedded"]["errors"].to_json
+      raise ValidationError, JSON.parse(last_response.body)["_embedded"]["errors"]
     when HTTP_FORBIDDEN
       raise ForbiddenError
     when HTTP_NOT_FOUND
