@@ -1,3 +1,3 @@
 class HelpScout
-  VERSION = "1.0.0.beta1"
+  VERSION = "2.0.0"
 end
